@@ -77,9 +77,9 @@ func (s *subscription) GetByPlanType(planType models.PlanType) ([]*models.Subscr
 	})
 }
 
-func (s *subscription) GetActiveForUser(key pkg.PrimaryKey) (*models.Subscription, error) {
+func (s *subscription) GetActiveForUser(id pkg.PrimaryKey) (*models.Subscription, error) {
 	subs, err := s.r.GetBy(func(m *models.Subscription) bool {
-		return m.UserID == key && m.CreatedAt.Add(plans[m.PlanType].Duration).After(time.Now())
+		return m.UserID == id
 	})
 	if err != nil {
 		return nil, err
@@ -87,5 +87,13 @@ func (s *subscription) GetActiveForUser(key pkg.PrimaryKey) (*models.Subscriptio
 	if len(subs) == 0 {
 		return nil, ErrNoActiveSubscription
 	}
-	return subs[0], nil
+	lastSub := subs[len(subs)-1]
+	active := true
+	if lastSub.PlanType != models.PlanTypeFree {
+		active = lastSub.CreatedAt.Add(plans[lastSub.PlanType].Duration).After(time.Now())
+	}
+	if !active {
+		return nil, ErrNoActiveSubscription
+	}
+	return lastSub, nil
 }
