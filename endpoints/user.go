@@ -24,7 +24,7 @@ type createUserRequest struct {
 
 // NewUser returns a new user endpoint
 func NewUser(s services.User) *User {
-	return &User{userService: s}
+	return &User{s}
 }
 
 // Register registers the user endpoint

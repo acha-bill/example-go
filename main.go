@@ -21,5 +21,13 @@ func main() {
 	userEndpoint := endpoints.NewUser(userService)
 	userEndpoint.Register(e.Group("/users"))
 
+	subscriptionRepo, err := repo.NewSubscription(db)
+	if err != nil {
+		e.Logger.Fatalf("failed to create subscription repo: %s", err.Error())
+	}
+	subscriptionService := services.NewSubscription(subscriptionRepo)
+	subscriptionEndpoint := endpoints.NewSubscription(subscriptionService, userService)
+	subscriptionEndpoint.Register(e.Group("/subscriptions"))
+
 	e.Logger.Fatal(e.Start(":8080"))
 }

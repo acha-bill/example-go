@@ -21,10 +21,10 @@ type Plan struct {
 }
 
 type Subscription struct {
-	ID        pkg.PrimaryKey
-	UserID    pkg.PrimaryKey
-	PlanType  PlanType
-	CreatedAt time.Time
+	ID        pkg.PrimaryKey `json:"id"`
+	UserID    pkg.PrimaryKey `json:"user_id"`
+	PlanType  PlanType       `json:"plan_type"`
+	CreatedAt time.Time      `json:"created_at"`
 }
 
 func (s *Subscription) GetID() pkg.PrimaryKey {

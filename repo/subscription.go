@@ -58,9 +58,9 @@ func (s *subscription) GetBy(filter func(*models.Subscription) bool) ([]*models.
 	if err != nil {
 		return nil, fmt.Errorf("error finding subscriptions: %w", err)
 	}
-	var subscriptions []*models.Subscription
-	for _, m := range ms {
-		subscriptions = append(subscriptions, m.(*models.Subscription))
+	subscriptions := make([]*models.Subscription, len(ms))
+	for i, m := range ms {
+		subscriptions[i] = m.(*models.Subscription)
 	}
 	return subscriptions, nil
 }

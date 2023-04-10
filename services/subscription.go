@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrNoActiveSubscription = errors.New("no active subscription")
+	ErrInvalidPlanType      = errors.New("invalid plan type")
 )
 
 const planDuration = 30 * 24 * time.Hour
@@ -49,6 +50,8 @@ type Subscription interface {
 	GetByPlanType(planType models.PlanType) ([]*models.Subscription, error)
 	// GetActiveForUser returns the active subscription for a user
 	GetActiveForUser(key pkg.PrimaryKey) (*models.Subscription, error)
+	// Find returns all subscriptions
+	Find() ([]*models.Subscription, error)
 }
 
 // NewSubscription returns a new Subscription service
@@ -57,6 +60,9 @@ func NewSubscription(r repo.Subscription) Subscription {
 }
 
 func (s *subscription) Create(m *models.Subscription) error {
+	if _, ok := plans[m.PlanType]; !ok {
+		return ErrInvalidPlanType
+	}
 	m.CreatedAt = time.Now()
 	return s.r.Create(m)
 }
@@ -96,4 +102,10 @@ func (s *subscription) GetActiveForUser(id pkg.PrimaryKey) (*models.Subscription
 		return nil, ErrNoActiveSubscription
 	}
 	return lastSub, nil
+}
+
+func (s *subscription) Find() ([]*models.Subscription, error) {
+	return s.r.GetBy(func(m *models.Subscription) bool {
+		return true
+	})
 }
