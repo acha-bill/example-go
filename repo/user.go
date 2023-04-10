@@ -17,6 +17,8 @@ type User interface {
 	GetByID(key pkg.PrimaryKey) (*models.User, error)
 	// GetByUsername returns a user by its username
 	GetByUsername(username string) ([]*models.User, error)
+	// FindAll returns all users
+	FindAll() ([]*models.User, error)
 }
 
 type user struct {
@@ -65,9 +67,31 @@ func (u *user) GetByUsername(username string) ([]*models.User, error) {
 	return users, nil
 }
 
+func (u *user) FindAll() ([]*models.User, error) {
+	table, err := u.db.Table(usersTable)
+	if err != nil {
+		return nil, fmt.Errorf("error getting table: %w", err)
+	}
+	ms, err := table.Find(func(model pkg.Model) bool {
+		return true
+	})
+	if err != nil {
+		return nil, fmt.Errorf("error finding users: %w", err)
+	}
+	users := make([]*models.User, len(ms))
+	for i, model := range ms {
+		users[i] = model.(*models.User)
+	}
+	return users, nil
+}
+
 // NewUser returns a new user repository
-func NewUser(db pkg.DB) User {
-	return &user{db}
+func NewUser(db pkg.DB) (User, error) {
+	err := db.AddTable(usersTable)
+	if err != nil {
+		return nil, fmt.Errorf("error adding table: %w", err)
+	}
+	return &user{db}, nil
 }
 
 var _ User = &user{}

@@ -65,4 +65,11 @@ func (s *subscription) GetBy(filter func(*models.Subscription) bool) ([]*models.
 	return subscriptions, nil
 }
 
+func NewSubscription(db pkg.DB) (Subscription, error) {
+	if err := db.AddTable(subscriptionsTable); err != nil {
+		return nil, fmt.Errorf("error adding table: %w", err)
+	}
+	return &subscription{db: db}, nil
+}
+
 var _ Subscription = (*subscription)(nil)

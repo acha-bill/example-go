@@ -14,6 +14,8 @@ type User interface {
 	GetByID(key pkg.PrimaryKey) (*models.User, error)
 	// GetByUsername returns a user by its username
 	GetByUsername(username string) ([]*models.User, error)
+	// FindAll returns all users
+	FindAll() ([]*models.User, error)
 }
 
 type user struct {
@@ -30,6 +32,10 @@ func (u *user) GetByID(key pkg.PrimaryKey) (*models.User, error) {
 
 func (u *user) GetByUsername(username string) ([]*models.User, error) {
 	return u.r.GetByUsername(username)
+}
+
+func (u *user) FindAll() ([]*models.User, error) {
+	return u.r.FindAll()
 }
 
 // NewUser returns a new user service
